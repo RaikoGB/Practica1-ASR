@@ -176,7 +176,7 @@ def graphRRD(cont,tiempo):
                      "AREA:DatagramOut#00FF00:Tráfico de entrada")
         
 def GenerarPDF():
-    w,hi =A4
+    w, hi =A4
     print(30*"-","Menu de creacion de pdf", 30*"-")
     print("Agentes Monitorizados:")
     for i in range(len(Agentes)):
@@ -185,6 +185,7 @@ def GenerarPDF():
     tiempo=int(input("Digita el tiempo a graficar en segundos:"))
     for j in range(len(Agentes)):
         if j==id:
+            print("Construyendo el agente ",j)
             #1.3.6.1.2.1.1.1.0 sistema operativo y sacar la img de ahi 1.3.6.1.2.1.1.6.0ese es el bueno
             #1.3.6.1.2.1.1.5.0 nombre del sistema 
             #1.3.6.1.2.1.1.6.0 ubicacion geografica?
@@ -203,7 +204,7 @@ def GenerarPDF():
                 c.drawImage("Linux.png", 20, hi-60, width=50, height=50)
             else:
                 c.drawImage("Windows.png", 20, hi-60, width=50, height=50)
-            text = c.beginText(50, hi-120)
+            text = c.beginText(50, hi-100)
             text.textLines("Nombre: "+str(Res2)+"\n"+
                            "Version: SNMP v"+str(Res4)+"\n"+
                            "SO: "+str(Res1)+"\n"+
@@ -215,16 +216,15 @@ def GenerarPDF():
             c.drawText(text)
             graphRRD(j,tiempo)
             time.sleep(5)
-            c.drawImage("1.png", 50, hi - 300, width=400, height=200)
-            c.drawImage("2.png", 50, hi - 600, width=400, height=200)
+            c.drawImage("1.png", 50, hi-500, width=400, height=200)
             c.showPage()
-            c.drawImage("3.png", 50, hi - 210, width=400, height=200)
-            c.drawImage("4.png", 50, hi - 410, width=400, height=200)
-            c.drawImage("5.png", 50, hi - 610, width=400, height=200)
+            c.drawImage("2.png", 50, hi-210, width=400, height=200)
+            c.drawImage("3.png", 50, hi-410, width=400, height=200)
+            c.drawImage("4.png", 50, hi-610, width=400, height=200)
+            c.showPage()
+            c.drawImage("5.png", 50, hi-210, width=400, height=200)
             c.showPage()
             c.save()
-        else:
-            print("Agente no encontrado")
 
 def CreateRRD():
     for i in range(len(Agentes)):
@@ -279,12 +279,9 @@ def UpdateRRD():
             valor= "N:"+str(Con1)+":"+str(Con2)+":"+str(Con3)+":"+str(Con4)+":"+str(Con5)
             #print(valor)
             #error aqui, posiblemente modificar createRRD
-            rrdtool.update(str(i)+".rdd", valor)
-            rrdtool.dump(str(i)+".rdd",str(i)+".xml")
+            rrdtool.update(str(i)+".rrd", valor)
+            rrdtool.dump(str(i)+".rrd",str(i)+".xml")
             time.sleep(1) 
-    if ret:
-        print (rrdtool.error())
-        time.sleep(300)
 
 while True:
     #Windows
@@ -325,12 +322,16 @@ while True:
             time.sleep(5)
             stop_threads=False
             CreateRRD()
+            time.sleep(20)
             h = threading.Thread(target=UpdateRRD)
+            time.sleep(20)
             h.start()
             threads=True
         else:
             CreateRRD()
+            time.sleep(20)
             h = threading.Thread(target=UpdateRRD)
+            time.sleep(20)
             h.start()
             threads=True 
     elif opcion=="5":
@@ -338,7 +339,7 @@ while True:
     elif opcion=="6":
         if threads==True:
             stop_threads=True
-            time.sleep(5)
+            time.sleep(20)
             h.join()
             break
         else:
